@@ -36,7 +36,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	auth.inMemoryAuthentication()
 		.passwordEncoder(encoder())
 		.withUser("cokicoki").password(encoder().encode("enaksekali"))
-		.roles("USER");
+		.roles("ADMIN");
 	}
 
     @Bean
@@ -52,4 +52,5 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     {
         auth.userDetailsService(userDetailsService).passwordEncoder(encoder());
     }
+
 }
