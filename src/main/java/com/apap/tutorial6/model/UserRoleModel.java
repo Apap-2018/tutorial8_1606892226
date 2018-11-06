@@ -1,25 +1,10 @@
 package com.apap.tutorial6.model;
 
-import java.io.Serializable;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.io.Serializable;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
-/**
- * CarModel
- */
 @Entity
 @Table(name = "user_role")
 public class UserRoleModel implements Serializable {
@@ -29,7 +14,7 @@ public class UserRoleModel implements Serializable {
 
     @NotNull
     @Size(max = 50)
-    @Column(name = "username", nullable = false)
+    @Column(name = "username", nullable = false, unique = true)
     private String username;
 
     @NotNull
@@ -73,6 +58,4 @@ public class UserRoleModel implements Serializable {
     public void setRole(String role) {
         this.role = role;
     }
-
-
 }

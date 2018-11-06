@@ -6,6 +6,7 @@
 
     <object th:include="fragments/fragment :: css" th:remove="tag"></object>
     <object th:include="fragments/fragment :: js" th:remove="tag"></object>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 </head>
 
 <body>
@@ -13,7 +14,7 @@
 
 <div class="container-fluid">
     <h2 th:text=" 'Hello ' + ${#httpServletRequest.remoteUser} + ' !'">Login as</h2>
-
+    <h4 th:text="${role}" style="text-transform: capitalize;">Role</h4>
     <div class="row">
         <div class="col-md-6">
             <div class="card">
@@ -21,18 +22,21 @@
                     Tambah User Baru
                 </div>
                 <div class="card-body">
-                    <form th:action="@{/user/addUser}" method="POST">
+                    <ul id="error-tambah-user" th:if="${errorFlagTambahUser}">
+                        <li th:each="value : ${errorValueTambahUser}" th:text="${value}" style="color:red"></li>
+                    </ul>
+                    <form th:action="@{/user/addUser}" method="post">
                         <div class="row form-group">
-                            <label class="col-sm-4"> User Name</label>
-                            <input class="col-sm-8 form-control input-sm" type="text" name="username"/>
+                            <label for="" class="col-sm-4">User Name</label>
+                            <input type="text" class="col-sm-8 form-control input-sm input-tambah-user" name="username">
                         </div>
                         <div class="row form-group">
-                            <label class="col-sm-4"> Password: </label>
-                            <input class="col-sm-8 form-control input-sm" type="password" name="password" required pattern="(?=.*\d)(?=.*[a-zA-Z]).{8,}" title="Password must be 8 characters including 1 letter and 1 numeric characters"/>
+                            <label for="" class="col-sm-4">Password: </label>
+                            <input type="password" class="col-sm-8 form-control input-sm input-tambah-user" name="password" required pattern="(?=.*\d)(?=.*[a-zA-Z]).{8,}" title="Password must be 8 characters including 1 letter and 1 numeric characters"/>
                         </div>
                         <div class="row form-group">
-                            <label class="col-sm-4"> Role: </label>
-                            <input class="col-sm-8 form-control input-sm" type="text" name="role"/>
+                            <label for="" class="col-sm-4">Role: </label>
+                            <input type="text" class="col-sm-8 form-control input-sm input-tambah-user" name="role">
                         </div>
                         <div>
                             <button type="submit" class="btn btn-primary">Simpan</button>
@@ -42,39 +46,44 @@
             </div>
         </div>
     </div>
-    <br>
-    <!--         <div class="row">
-                <div class="col-md-6">
-                    <div class="card">
-                        <div class="card-header">
-                            Tambah Dealer
-                        </div>
-                        <div class="card-body">
-                            <p class="card-text">Fitur untuk menambah dealer.</p>
-                            <a class="btn btn-primary" th:href="@{/dealer/add}">Tambah</a>
-                        </div>
-                    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    Update Password
                 </div>
-            </div>
-            <br>
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="card">
-                        <div class="card-header">
-                            Cari Dealer berdasarkan Id
-                        </div>
-                        <form th:action="@{/dealer/view}" method="GET">
-                            <div class="card-body">
-                                <label for="dealerId">Id Dealer:</label>
-                                <input type="text" name="dealerId" class="form-control" />
-                                <button type="submit" class="btn btn-primary">Cari</button>
-                            </div>
-                        </form>
+                <div class="card-body">
+                    <div id="error" style="display: none">
+                        <span style="color:red">Password Baru dan Konfirmasi Password Baru Harus Sama.</span>
                     </div>
+                    <div id="error-from-past-update-password" th:if="${errorFlagUpdatePassword}">
+                        <span style="color:red" th:text="${errorValueUpdatePassword}"></span>
+                    </div>
+                    <ul id="error-update-password" th:if="${errorListFlagUpdatePassword}">
+                        <li th:each="value : ${errorListValueUpdatePassword}" th:text="${value}" style="color:red"></li>
+                    </ul>
+                    <form th:action="@{/user/updatePassword}" method="post">
+                        <div class="row form-group">
+                            <label for="" class="col-sm-4">Password Lama</label>
+                            <input type="password" class="col-sm-8 form-control input-sm input-update-password" name="passwordLama" required>
+                        </div>
+                        <div class="row form-group">
+                            <label for="" class="col-sm-4">Password: </label>
+                            <input id="passwordBaru" type="password" class="col-sm-8 form-control input-sm input-update-password" name="passwordBaru" required pattern="(?=.*\d)(?=.*[a-zA-Z]).{8,}" title="Password must be 8 characters including 1 letter and 1 numeric characters"/>
+                        </div>
+                        <div class="row form-group">
+                            <label for="" class="col-sm-4">Konfirmasi Password Baru: </label>
+                            <input id="passwordBaruKonfirmasi" type="password" class="col-sm-8 form-control input-sm input-update-password" name="passwordBaruKonfirmasi" required>
+                        </div>
+                        <div>
+                            <button id="button-submit" type="submit" class="btn btn-primary" disabled>Update</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
-        <br> -->
+    </div>
+    <br>
     <div class="row">
         <div class="col-md-6">
             <div class="card">
@@ -92,5 +101,31 @@
         </div>
     </div>
 </div>
+
+<script type="text/javascript">
+    $("#passwordBaruKonfirmasi").on("input", function() {
+        if ($(this).val() == $("#passwordBaru").val()) {
+            $("#error").css("display", "none");
+            $("#button-submit").removeAttr("disabled");
+        } else {
+            $("#error").css("display", "block");
+        }
+    });
+    $("#passwordBaru").on("input", function() {
+        if ($(this).val() == $("#passwordBaruKonfirmasi").val()) {
+            $("#error").css("display", "none");
+            $("#button-submit").removeAttr("disabled");
+        } else {
+            $("#error").css("display", "block");
+        }
+    });
+    $(".input-tambah-user").on("input", function() {
+        $("#error-tambah-user").css("display", "none");
+    });
+    $(".input-update-password").on("input", function() {
+        $("#error-update-password").css("display", "none");
+        $("#error-from-past-update-password").css("display", "none");
+    });
+</script>
 </body>
 </html>
